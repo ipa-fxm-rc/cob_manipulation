@@ -67,6 +67,7 @@ private:
 	GraspTable* m_GraspTable;
 	
 public:
+	//~ CobPickPlaceActionServer() : group("base_arm") {}
 	CobPickPlaceActionServer() : group("arm") {}
 	~CobPickPlaceActionServer();
 	

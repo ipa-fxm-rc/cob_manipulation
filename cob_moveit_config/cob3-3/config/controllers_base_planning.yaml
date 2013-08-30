@@ -1,6 +1,6 @@
 controller_list:
   - name: arm_controller
-    ns: follow_joint_trajectory
+    ns: follow_joint_trajectory1
     default: true
     joints:
       - arm_1_joint
@@ -11,7 +11,7 @@ controller_list:
       - arm_6_joint
       - arm_7_joint
   - name: sdh_controller
-    ns: follow_joint_trajectory
+    ns: follow_joint_trajectory1
     default: true
     joints:
       - sdh_knuckle_joint
@@ -22,7 +22,7 @@ controller_list:
       - sdh_finger_22_joint
       - sdh_finger_23_joint
   - name: lookat_controller
-    ns: follow_joint_trajectory
+    ns: follow_joint_trajectory1
     default: true
     joints:
       - torso_lower_neck_tilt_joint

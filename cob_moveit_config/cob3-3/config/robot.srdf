@@ -26,8 +26,12 @@
         <joint name="sdh_thumb_2_joint" />
         <joint name="sdh_thumb_3_joint" />
     </group>
-    <group name="base"> 
+    <group name="base">
         <joint name="world_joint" />
+    </group>
+    <group name="base_arm">
+        <group name="arm" />
+        <group name="base" />
     </group>
     <!--END EFFECTOR: Purpose: Represent information about an end effector.-->
     <end_effector name="hand" parent_link="arm_7_link" group="sdh" />

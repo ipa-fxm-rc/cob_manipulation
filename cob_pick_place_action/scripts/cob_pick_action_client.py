@@ -2,13 +2,7 @@
 
 import roslib; roslib.load_manifest('cob_pick_place_action')
 import rospy
-import geometry_msgs.msg
-from geometry_msgs.msg import PoseStamped
-# Brings in the SimpleActionClient
 import actionlib
-
-# Brings in the messages used by the fibonacci action, including the
-# goal message and the result message.
 import cob_pick_place_action.msg 
 
 def cob_pick_action_client():
@@ -26,6 +20,8 @@ def cob_pick_action_client():
 	goal.object_name = "yellowsaltcube"
 	goal.object_pose.header.stamp = rospy.Time.now()
 	goal.object_pose.header.frame_id = "base_footprint"
+	
+	#~ THIS ONE WORKS FOR FIXED BASE
 	goal.object_pose.pose.position.x = -0.5
 	goal.object_pose.pose.position.y = -0.5  
 	goal.object_pose.pose.position.z =  0.6
@@ -33,6 +29,16 @@ def cob_pick_action_client():
 	goal.object_pose.pose.orientation.x = 0.0
 	goal.object_pose.pose.orientation.y = 0.0
 	goal.object_pose.pose.orientation.z = 0.0
+
+
+#~ THIS ONE IS FOR TESTING MOBILE BASE
+	#~ goal.object_pose.pose.position.x = 1.5
+	#~ goal.object_pose.pose.position.y = 1.5  
+	#~ goal.object_pose.pose.position.z =  0.6
+	#~ goal.object_pose.pose.orientation.w = 1.0
+	#~ goal.object_pose.pose.orientation.x = 0.0
+	#~ goal.object_pose.pose.orientation.y = 0.0
+	#~ goal.object_pose.pose.orientation.z = 0.0
 
 	
 	# Sends the goal to the action server.

@@ -37,7 +37,7 @@
 #include "geometric_shapes/shape_messages.h"
 #include "geometric_shapes/mesh_operations.h"
 #include "geometric_shapes/shape_operations.h"
-
+#include <ros/console.h>
 
 void CobPickPlaceActionServer::initialize()
 {
@@ -94,8 +94,8 @@ void CobPickPlaceActionServer::pick_goal_cb(const cob_pick_place_action::CobPick
 	group.setSupportSurfaceName("table");
 	
 	
-	group.setPlanningTime(20.0);	//default is 5.0 s
-	success = group.pick(goal->object_name, grasps);
+	group.setPlanningTime(50.0);	//default is 5.0 s
+	success = group.pick_plan_only(goal->object_name, grasps);
 	
 	
 	///Setting result
@@ -124,49 +124,59 @@ void CobPickPlaceActionServer::place_goal_cb(const cob_pick_place_action::CobPla
 	bool success = false;
 	
 	manipulation_msgs::PlaceLocation g;
-	geometry_msgs::PoseStamped p; 
-	p.header.frame_id = "base_footprint";
-	p.pose.position.x = -0.5;
-	p.pose.position.y = -0.5;  
-	p.pose.position.z =  0.6;
-	p.pose.orientation.w = 1.0;
-	p.pose.orientation.x = 0.0;
-	p.pose.orientation.y = 0.0;
-	p.pose.orientation.z = 0.0;
-	g.place_pose = p;  
+	//~ geometry_msgs::PoseStamped p; 
+	//~ p.header.frame_id = "base_footprint";
+	//~ p.pose.position.x = -0.5;
+	//~ p.pose.position.y = -0.5;  
+	//~ p.pose.position.z =  0.6;
+	//~ p.pose.orientation.w = 1.0;
+	//~ p.pose.orientation.x = 0.0;
+	//~ p.pose.orientation.y = 0.0;
+	//~ p.pose.orientation.z = 0.0;
+	g.place_pose = goal->destination;
+	
+	g.approach.direction.vector.z = -1.0;
+	g.retreat.direction.vector.z = 1.0;
+	g.retreat.direction.header.frame_id = "base_footprint";
+	g.approach.direction.header.frame_id = "base_footprint";
+	g.approach.min_distance = 0.1;
+	g.approach.desired_distance = 0.2;
+	g.retreat.min_distance = 0.1;
+	g.retreat.desired_distance = 0.25;
+	ROS_INFO_STREAM("g.place_pose" << g.place_pose);  
 	///Get grasps from corresponding GraspTable
-	
+	loc.push_back(g);
 	//~ manipulation_msgs::Grasp g;
-	unsigned int grasp_id =23;
-	unsigned int objectClassId =11;
-	Grasp *current_grasp = NULL;
-	
-	current_grasp = m_GraspTable->GetGrasp(objectClassId, grasp_id);
-	
-	if(current_grasp)
-	{
-		ROS_INFO("GraspIndex %d found",grasp_id);
-		
-		//HandPreGraspConfig
-		std::vector<double> current_hand_pre_config = current_grasp->GetHandPreGraspConfig();
-		sensor_msgs::JointState pre_grasp_posture;
-		pre_grasp_posture.position.clear();
-		for (unsigned int i=0; i<current_hand_pre_config.size(); i++)
-		{
-			pre_grasp_posture.position.push_back(current_hand_pre_config[i]);
-		}
-		g.post_place_posture = MapHandConfiguration(pre_grasp_posture);
-		
-		g.approach.direction.vector.z = -1.0;
-		g.retreat.direction.vector.z = 1.0;
-		g.retreat.direction.header.frame_id = "base_footprint";
-		g.approach.direction.header.frame_id = "base_footprint";
-		g.approach.min_distance = 0.1;
-		g.approach.desired_distance = 0.2;
-		g.retreat.min_distance = 0.1;
-		g.retreat.desired_distance = 0.25;
-		loc.push_back(g);
-	}
+	//~ unsigned int grasp_id =23;
+	//~ unsigned int objectClassId =11;
+	//~ Grasp *current_grasp = NULL;
+	//~ 
+	//~ current_grasp = m_GraspTable->GetGrasp(objectClassId, grasp_id);
+	//~ 
+	//~ if(current_grasp)
+	//~ {
+		//~ ROS_INFO("GraspIndex %d found",grasp_id);
+		//~ 
+		//~ //HandPreGraspConfig
+		//~ std::vector<double> current_hand_pre_config = current_grasp->GetHandPreGraspConfig();
+		//~ sensor_msgs::JointState pre_grasp_posture;
+		//~ pre_grasp_posture.position.clear();
+		//~ for (unsigned int i=0; i<current_hand_pre_config.size(); i++)
+		//~ {
+			//~ pre_grasp_posture.position.push_back(current_hand_pre_config[i]);
+		//~ }
+		//~ ////~ g.post_place_posture = MapHandConfiguration(pre_grasp_posture);
+		//~ 
+		//~ g.approach.direction.vector.z = -1.0;
+		//~ g.retreat.direction.vector.z = 1.0;
+		//~ g.retreat.direction.header.frame_id = "base_footprint";
+		//~ g.approach.direction.header.frame_id = "base_footprint";
+		//~ g.approach.min_distance = 0.1;
+		//~ g.approach.desired_distance = 0.2;
+		//~ g.retreat.min_distance = 0.1;
+		//~ g.retreat.desired_distance = 0.25;
+		//~ ////~ loc.push_back(g);
+	//~ }
 	group.setSupportSurfaceName("table");
 	group.setPlanningTime(20.0);	//default is 5.0 s
 	success = group.place(goal->object_name, loc);
@@ -177,13 +187,13 @@ void CobPickPlaceActionServer::place_goal_cb(const cob_pick_place_action::CobPla
 	if(success)
 	{
 		result.success.data=true;
-		response="Hurray!!! Pickup COMPLETE";
+		response="Hurray!!! Place COMPLETE";
 		as_place->setSucceeded(result, response);
 	}
 	else
 	{
 		result.success.data=false;
-		response="Alas!!! Pickup FAILED";
+		response="Alas!!! Place FAILED";
 		as_place->setAborted(result, response);
 	}
 }
